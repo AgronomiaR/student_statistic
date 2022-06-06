@@ -59,7 +59,7 @@ Conjunto de dados
 
 ```{r}
 library(knitr)
-kable(dados)
+DT::datatable(dados)
 ```
 
 Sexo e escolaridade {data-navmenu="Variáveis qualitativas"}
@@ -115,7 +115,22 @@ Row
 ```{r}
 prof=data.frame(table(dados$Emprego))
 graph=ggplot(prof,aes(x=Freq,y=Var1,fill=Var1))+geom_col()+
-  labs(y="Profissão",x="Frequência absoluta",fill="Sexo")
+  labs(y="Profissão",x="Frequência absoluta",fill="Profissão")
+ggplotly(graph)
+```
+
+Local de Nascimento {data-navmenu="Variáveis qualitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Frequência de pessoas por local de nascimento
+
+```{r}
+prof=data.frame(table(dados$`Local de Nascimento`))
+graph=ggplot(prof,aes(x=Freq,y=Var1,fill=Var1))+geom_col()+
+  labs(y="Local de Nascimento",x="Frequência absoluta",fill="Local de Nascimento")
 ggplotly(graph)
 ```
 
@@ -136,6 +151,7 @@ desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
 colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
 kable(desc)
 ```
+
 ### Por sexo
 
 ```{r}
@@ -191,6 +207,7 @@ desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
 colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
 kable(desc)
 ```
+
 ### Por sexo
 
 ```{r}
@@ -572,6 +589,27 @@ teste=t.test(dados$Altura~dados$Sexo)
 
 Como o p-valor calculado ($`r teste$p.value`$) é menor que o nível de significância adotado ($\alpha = 0.05$), rejeita-se $H_0$. Logo, as médias de altura entre os sexos são diferentes.
 
+**Manualmente:**
+
+$$\bar{X}_{masculino} = 174,74; S = 8,48; n = 80 $$
+
+$$\bar{X}_{feminino} = 162,89; S = 7,16; n = 105$$
+
+**Estatística do teste (teste t para duas médias populacionais com variância desconhecida e desigual**
+
+$$t_{cal} = \frac{\bar{X}_1-\bar{X}_1-\Delta}{\sqrt{\frac{S^2_1}{n_1}+\frac{S^2_1}{n_2}}}$$
+
+$$t_{cal} = \frac{174,74-162,89-0}{\sqrt{\frac{8,48^2}{80}+\frac{7,16^2}{105}}} = -10,064$$
+**Graus de liberdade de Welch-Satterthwaite**
+
+$$v = \frac{(\frac{S^2_1}{n_1}+\frac{S^2_2}{n_2})^2}{\frac{(S^2_1/n_1)^2}{n_1-1}+\frac{(S^2_2/n_2)^2}{n_2-1}}$$
+
+$$v = \frac{(\frac{8,48^2}{80}+\frac{7,16^2}{105})^2}{\frac{(8,48^2/80)^2}{80-1}+\frac{(7,16^2/105)^2}{105-1}} = 153,69 \approx 154$$
+
+$$t_{\alpha=0.05;\ gl=154} = 1,976$$
+
+Como o t calculado ($10,064$) é maior que o nível crítico [-1,9765; 1,9765], rejeita-se $H_0$. Logo, as médias de altura entre os sexos são diferentes.
+
 ### Peso
 
 $$H_{0}: Peso\ média\ sexo\ masculino = Peso\ média\ do\ sexo\ feminino$$
@@ -582,3 +620,22 @@ teste=t.test(dados$Peso~dados$Sexo)
 ```
 
 Como o p-valor calculado ($`r teste$p.value`$) é menor que o nível de significância adotado ($\alpha = 0.05$), rejeita-se $H_0$. Logo, as médias de peso entre os sexos são diferentes.
+
+$$\bar{X}_{masculino} = 80,79; S = 13,55; n = 80$$
+
+$$\bar{X}_{feminino} = 67,89; S = 12,23; n = 105 $$
+
+**Estatística do teste (teste t para duas médias populacionais com variância desconhecida e desigual**
+
+$$t_{cal} = \frac{\bar{X}_1-\bar{X}_1-\Delta}{\sqrt{\frac{S^2_1}{n_1}+\frac{S^2_1}{n_2}}}$$
+
+$$t_{cal} = \frac{80,79-67,89-0}{\sqrt{\frac{12,23^2}{80}+\frac{13,55^2}{105}}} = -6,6926$$
+**Graus de liberdade de Welch-Satterthwaite**
+
+$$v = \frac{(\frac{S^2_1}{n_1}+\frac{S^2_2}{n_2})^2}{\frac{(S^2_1/n_1)^2}{n_1-1}+\frac{(S^2_2/n_2)^2}{n_2-1}}$$
+
+$$v = \frac{(\frac{13,55^2}{80}+\frac{12,23^2}{105})^2}{\frac{(13,55^2/80)^2}{80-1}+\frac{(12,23^2/105)^2}{105-1}} = 160,5 \approx 161$$
+
+$$t_{\alpha=0.05;\ gl=161} = 1,9748$$
+
+Como o t calculado ($6,6926$) é maior que o nível crítico [-1,9748; 1,9748], rejeita-se $H_0$. Logo, as médias de peso entre os sexos são diferentes.
