@@ -1,0 +1,584 @@
+---
+title: "Estatística"
+author: ""
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(plotly)
+library(plyr)
+library(flexdashboard)
+setwd("C:/Users/Usuario/OneDrive - uel.br/AULA_ESTATÍSTICA")
+dados=readxl::read_excel("dados_pesquisa.xlsx")
+```
+
+Home
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Introdução
+
+Os dados dessa painel de controle foram oriundos de pesquisas realizadas pelos alunos de Relações Públicas do período Matutino e Noturno e dos alunos de Geografia Matutino e Noturno. Ao todo, 185 pessoas foram entrevistas em relação à idade, sexo, nível de escolaridade, peso, altura, profissão e algumas outras variáveis, como renda fixa mensal e consumo de água.
+
+
+### 
+
+![](https://www.questionpro.com/blog/wp-content/uploads/2018/03/Amostragem-min.jpg)
+
+Row
+-----------------------------------------------------------------------
+
+### Contribuição
+
+```{r}
+contrib=data.frame(table(dados$Curso))
+graph=ggplot(contrib,aes(y=Freq,x=Var1,fill=Var1))+geom_col()+
+  labs(x="Curso",y="Frequência absoluta",fill="Curso")
+ggplotly(graph)
+```
+
+### Contato
+
+Prof. Msc. Gabriel Danilo Shimizu
+
+e-mail: shimizu@uel.br
+
+Departamento de estatística, Centro de Ciências Exatas
+
+Conjunto de dados
+=======================================================================
+
+### Conjunto de dados coletados pelos alunos de Geografia e Relações Públicas
+
+```{r}
+library(knitr)
+kable(dados)
+```
+
+Sexo e escolaridade {data-navmenu="Variáveis qualitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Frequência de pessoas por sexo
+
+```{r}
+sexo=data.frame(table(dados$Sexo))
+```
+
+Somando-se os dados oriundos das pessoas entrevistadas pelos alunos da Geografia matutino, geografia noturno, relações públicas matutino e relações públicas noturno, foi coletado `r length(dados$Sexo)` pessoas, sendo `r sexo$Freq[1]` do sexo Feminino e `r sexo$Freq[2]` do sexo masculino.
+
+### Frequência de pessoas por escolaridade
+
+```{r}
+escol=data.frame(table(dados$`Nível de Escolaridade`))
+```
+
+Do total de pessoas, `r escol$Freq[1]` possuem `r escol$Var1[1]`, `r escol$Freq[2]` possuem `r escol$Var1[2]`, `r escol$Freq[3]` possuem `r escol$Var1[3]`, `r escol$Freq[4]` possuem `r escol$Var1[4]`, `r escol$Freq[5]` possuem `r escol$Var1[5]`, `r escol$Freq[6]` possuem `r escol$Var1[6]` e `r escol$Freq[7]` possuem `r escol$Var1[7]`.
+
+Row
+-----------------------------------------------------------------------
+
+### Frequência de pessoas por sexo
+
+```{r}
+graph=ggplot(sexo,aes(y=Freq,x=Var1,fill=Var1))+geom_col()+
+  labs(x="Sexo",y="Frequência absoluta",fill="Sexo")
+ggplotly(graph)
+```
+
+### Frequência de pessoas por Escolaridade
+
+```{r}
+graph=ggplot(escol,aes(y=Freq,x=Var1,fill=Var1))+geom_col()+
+  theme(axis.text.x = element_blank())+labs(x="",y="Frequência absoluta",fill="Escolaridade")
+ggplotly(graph)
+```
+
+
+Profissão {data-navmenu="Variáveis qualitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Frequência de pessoas por profissão
+
+```{r}
+prof=data.frame(table(dados$Emprego))
+graph=ggplot(prof,aes(x=Freq,y=Var1,fill=Var1))+geom_col()+
+  labs(y="Profissão",x="Frequência absoluta",fill="Sexo")
+ggplotly(graph)
+```
+
+Altura {data-navmenu="Variáveis quantitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+media=round(mean(dados$Altura,na.rm=TRUE),2)
+desvio=round(sd(dados$Altura,na.rm=TRUE),2)
+vari=round(var(dados$Altura,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+### Por sexo
+
+```{r}
+media=round(tapply(dados$Altura,dados$Sexo,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Altura,dados$Sexo,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Altura,dados$Sexo,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+Row
+-----------------------------------------------------------------------
+
+### Por profissão
+
+```{r}
+media=round(tapply(dados$Altura,dados$Emprego,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Altura,dados$Emprego,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Altura,dados$Emprego,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+### Nível de escolaridade
+
+```{r}
+media=round(tapply(dados$Altura,dados$`Nível de Escolaridade`,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Altura,dados$`Nível de Escolaridade`,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Altura,dados$`Nível de Escolaridade`,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+Idade {data-navmenu="Variáveis quantitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+media=round(mean(dados$Idade,na.rm=TRUE),2)
+desvio=round(sd(dados$Idade,na.rm=TRUE),2)
+vari=round(var(dados$Idade,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+### Por sexo
+
+```{r}
+media=round(tapply(dados$Idade,dados$Sexo,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Idade,dados$Sexo,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Idade,dados$Sexo,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+Row
+-----------------------------------------------------------------------
+
+### Por profissão
+
+```{r}
+media=round(tapply(dados$Idade,dados$Emprego,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Idade,dados$Emprego,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Idade,dados$Emprego,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+### Nível de escolaridade
+
+```{r}
+media=round(tapply(dados$Idade,dados$`Nível de Escolaridade`,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Idade,dados$`Nível de Escolaridade`,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Idade,dados$`Nível de Escolaridade`,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+Peso {data-navmenu="Variáveis quantitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+media=round(mean(dados$Peso,na.rm=TRUE),2)
+desvio=round(sd(dados$Peso,na.rm=TRUE),2)
+vari=round(var(dados$Peso,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+### Por sexo
+
+```{r}
+media=round(tapply(dados$Peso,dados$Sexo,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Peso,dados$Sexo,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Peso,dados$Sexo,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Por profissão
+
+```{r}
+media=round(tapply(dados$Peso,dados$Emprego,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Peso,dados$Emprego,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Peso,dados$Emprego,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+### Nível de escolaridade
+
+```{r}
+media=round(tapply(dados$Peso,dados$`Nível de Escolaridade`,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Peso,dados$`Nível de Escolaridade`,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Peso,dados$`Nível de Escolaridade`,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+Renda Mensal {data-navmenu="Variáveis quantitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+media=round(mean(dados$Renda,na.rm=TRUE),2)
+desvio=round(sd(dados$Renda,na.rm=TRUE),2)
+vari=round(var(dados$Renda,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+### Por sexo
+
+```{r}
+media=round(tapply(dados$Renda,dados$Sexo,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Renda,dados$Sexo,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Renda,dados$Sexo,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Por profissão
+
+```{r}
+media=round(tapply(dados$Renda,dados$Emprego,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Renda,dados$Emprego,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Renda,dados$Emprego,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+### Nível de escolaridade
+
+```{r}
+media=round(tapply(dados$Renda,dados$`Nível de Escolaridade`,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$Renda,dados$`Nível de Escolaridade`,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$Renda,dados$`Nível de Escolaridade`,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+Consumo de água {data-navmenu="Variáveis quantitativas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+media=round(mean(dados$`Consumo de agua`,na.rm=TRUE),2)
+desvio=round(sd(dados$`Consumo de agua`,na.rm=TRUE),2)
+vari=round(var(dados$`Consumo de agua`,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+### Por sexo
+
+```{r}
+media=round(tapply(dados$`Consumo de agua`,dados$Sexo,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$`Consumo de agua`,dados$Sexo,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$`Consumo de agua`,dados$Sexo,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+Row
+-----------------------------------------------------------------------
+
+### Por profissão
+
+Nota: Os alunos que coletaram dados de consumo de água não coletaram a informação de profissão.
+
+```{r}
+media=round(tapply(dados$`Consumo de agua`,dados$Emprego,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$`Consumo de agua`,dados$Emprego,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$`Consumo de agua`,dados$Emprego,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+### Nível de escolaridade
+
+```{r}
+media=round(tapply(dados$`Consumo de agua`,dados$`Nível de Escolaridade`,mean,na.rm=TRUE),2)
+desvio=round(tapply(dados$`Consumo de agua`,dados$`Nível de Escolaridade`,sd,na.rm=TRUE),2)
+vari=round(tapply(dados$`Consumo de agua`,dados$`Nível de Escolaridade`,var,na.rm=TRUE),2)
+cv=round(desvio/media*100,2)
+desc=data.frame("Media"=media,"Desvio padrao"=desvio,"Variancia"=vari,"CV"=cv)
+colnames(desc)=c("Média","Desvio-padrão", "Variância", "CV(%)")
+kable(desc)
+```
+
+
+Altura {data-navmenu="Gráfico de caixas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+graph=ggplot(dados,aes(y=Altura,x=""))+
+  geom_boxplot(fill="lightgreen")+labs(x="",y="Altura (cm)")
+ggplotly(graph)
+```
+
+### Por Sexo
+
+```{r}
+graph=ggplot(dados,aes(y=Altura,x=Sexo,fill=Sexo))+
+  geom_boxplot()+labs(y="Altura (cm)")
+ggplotly(graph)
+```
+
+Peso {data-navmenu="Gráfico de caixas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+graph=ggplot(dados,aes(y=Peso,x=""))+
+  geom_boxplot(fill="lightgreen")+labs(x="",y="Peso (kg)")
+ggplotly(graph)
+```
+
+### Por Sexo
+
+```{r}
+graph=ggplot(dados,aes(y=Peso,x=Sexo,fill=Sexo))+
+  geom_boxplot()+labs(y="Peso (Kg)")
+ggplotly(graph)
+```
+
+Idade {data-navmenu="Gráfico de caixas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+graph=ggplot(dados,aes(y=Idade,x=""))+
+  geom_boxplot(fill="lightgreen")+labs(x="",y="Idade (anos)")
+ggplotly(graph)
+```
+
+### Por Sexo
+
+```{r}
+graph=ggplot(dados,aes(y=Idade,x=Sexo,fill=Sexo))+
+  geom_boxplot()+labs(y="Idade (anos)")
+ggplotly(graph)
+```
+
+Renda {data-navmenu="Gráfico de caixas"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Geral
+
+```{r}
+graph=ggplot(dados,aes(y=Renda,x=""))+
+  geom_boxplot(fill="lightgreen")+labs(x="",y="Renda (R$/mês)")
+ggplotly(graph)
+```
+
+### Por Sexo
+
+```{r}
+graph=ggplot(dados,aes(y=Renda,x=Sexo,fill=Sexo))+
+  geom_boxplot()+labs(y="Renda (R$/mês)")
+ggplotly(graph)
+```
+
+Gráfico de dispersão {data-navmenu="Correlação"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Idade x Altura
+
+```{r}
+library(AgroR)
+graph1=plot_cor(dados$Idade,dados$Altura,ic = FALSE,xlab = "Idade (anos)",ylab="Altura (cm)")
+ggplotly(graph1)
+```
+
+### Idade x Peso
+
+```{r}
+graph2=plot_cor(dados$Idade,dados$Peso,ic = FALSE,xlab = "Idade (anos)",ylab="Peso (kg)")
+ggplotly(graph2)
+```
+
+### Idade x Renda
+
+```{r}
+graph3=plot_cor(dados$Idade[!is.na(dados$Renda)],dados$Renda[!is.na(dados$Renda)],ic = FALSE,xlab = "Idade (anos)",ylab="Renda (R$/mês)")
+ggplotly(graph3)
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### Altura x Peso
+
+```{r}
+graph4=plot_cor(dados$Altura,dados$Peso,ic = FALSE,xlab="Altura (cm)",ylab="Peso (kg)")
+ggplotly(graph4)
+```
+
+### Altura x Peso
+
+```{r}
+graph5=plot_cor(dados$Altura[!is.na(dados$Renda)],dados$Renda[!is.na(dados$Renda)],ic = FALSE,xlab="Altura (cm)",ylab="Renda (R$/mês)")
+ggplotly(graph5)
+```
+
+### Peso x Renda
+
+```{r}
+graph6=plot_cor(dados$Peso[!is.na(dados$Renda)],dados$Renda[!is.na(dados$Renda)],ic = FALSE,xlab="Peso (kg)",ylab="Renda (R$/mês)")
+ggplotly(graph6)
+```
+
+Interpretação {data-navmenu="Correlação"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Interpretação
+
+ - Foi observado correlação negativa entre as variáveis Idade e Altura ($r = `r graph1$plot$corre`$)
+  - Foi observado correlação positiva entre as variáveis Idade e Peso ($r = `r graph2$plot$corre`$)
+ - Foi observado correlação positiva entre as variáveis Idade e Renda ($r = `r graph3$plot$corre`$)
+  - Foi observado correlação positiva entre as variáveis Altura e Peso ($r = `r graph4$plot$corre`$)
+ - Foi observado correlação positiva entre as variáveis Altura e Renda ($r = `r graph5$plot$corre`$)
+  - Foi observado correlação positiva entre as variáveis Peso e Renda ($r = `r graph6$plot$corre`$)
+
+
+Teste {data-navmenu="Comparações"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Altura
+
+$$H_{0}: Altura\ média\ sexo\ masculino = Altura\ média\ do\ sexo\ feminino$$
+$$H_{1}: Altura\ média\ sexo\ masculino \neq Altura\ média\ do\ sexo\ feminino$$
+```{r}
+teste=t.test(dados$Altura~dados$Sexo)
+```
+
+Como o p-valor calculado ($`r teste$p.value`$) é menor que o nível de significância adotado ($\alpha = 0.05$), rejeita-se $H_0$. Logo, as médias de altura entre os sexos são diferentes.
+
+### Peso
+
+$$H_{0}: Peso\ média\ sexo\ masculino = Peso\ média\ do\ sexo\ feminino$$
+$$H_{1}: Peso\ média\ sexo\ masculino \neq Peso\ média\ do\ sexo\ feminino$$
+
+```{r}
+teste=t.test(dados$Peso~dados$Sexo)
+```
+
+Como o p-valor calculado ($`r teste$p.value`$) é menor que o nível de significância adotado ($\alpha = 0.05$), rejeita-se $H_0$. Logo, as médias de peso entre os sexos são diferentes.
